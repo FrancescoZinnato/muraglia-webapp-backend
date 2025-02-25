@@ -204,61 +204,6 @@ public class StripeController {
         }
     }
     
-    /*@PostMapping("/webhook")
-    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws StripeException {
-        // Verifica la firma e il payload
-    	System.out.println("Sono nel metodo che gestisce il webhook");
-        Event event;
-        try {
-        	System.out.println("Sto provando a verificare che il webhook sia di Stripe");
-            event = Webhook.constructEvent(payload, sigHeader, this.webhookSecret); // Inserisco il mio webhook secret per assicurarmi che provenga da Stripe
-        } catch (SignatureVerificationException e) {
-        	System.out.println("Verifica del webhook andata male");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Webhook error: " + e.getMessage());
-        }
-
-        // Gestisci l'evento
-        System.out.println("L'evento è stato verificato ed è di tipo: - " + event.getType());
-        if ("checkout.session.completed".equals(event.getType())) {
-        	System.out.println("La checkout session è stata correttamente completata");
-        	// Ottieni la sessione, che è una rappresentazione vuota a meno del payment_intent id
-            Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
-
-            if (session != null && session.getPaymentIntent() != null) {
-            	System.out.println("Sono nell'IF che controlla sessione e paymentIntent dove aggiorno l'ordine");
-                // Recupera l'ID del payment_intent
-                String paymentIntentId = session.getPaymentIntent();
-
-                // Ora fai una chiamata per recuperare il PaymentIntent completo, i metadata sono nel PaymentIntent, non nella Session
-                PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId); // Lancia una StripeException in caso di errore
-
-                // Ora puoi accedere ai metadata
-                Integer id_ordine = Integer.valueOf(paymentIntent.getMetadata().get("id_ordine"));
-                Ordine o = this.ordService.recuperaOrdine(id_ordine);
-                o.setPayment_id(paymentIntentId);
-                this.ordService.salvaOrdine(o);
-            } else if (session != null && session.getPaymentIntent() == null) {
-            	System.out.println("Il payment intent è null");
-            } else {
-            	System.out.println("La session è null"); // Questo è il problema al momento
-            }
-        	/*
-            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().get();
-            String paymentIntentId = paymentIntent.getId();
-            // Recupero metadata personalizzati
-            Integer id_ordine = Integer.valueOf(paymentIntent.getMetadata().get("id_ordine"));
-            // Aggiorna l'ordine nel database qui usando paymentIntentId
-            Ordine o = this.ordService.recuperaOrdine(id_ordine);
-            o.setPayment_id(paymentIntentId);
-            this.ordService.salvaOrdine(o);
-            *-/
-        }else {
-        	System.out.println("L'evento è del tipo sbagliato");
-        }
-
-        return ResponseEntity.ok("Webhook received");
-    }*/
-    
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws StripeException {
         Event event;
